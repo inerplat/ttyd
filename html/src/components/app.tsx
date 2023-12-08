@@ -3,6 +3,7 @@ import { h, Component } from 'preact';
 import { ITerminalOptions, ITheme } from 'xterm';
 import { ClientOptions, FlowControl } from './terminal/xterm';
 import { Terminal } from './terminal';
+import { useState } from 'preact/compat';
 
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const path = window.location.pathname.replace(/[/]+$/, '');
@@ -50,16 +51,41 @@ const flowControl = {
 } as FlowControl;
 
 export class App extends Component {
+    sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
     render() {
+        const [show, setShow] = useState(false);
         return (
-            <Terminal
-                id="terminal-container"
-                wsUrl={wsUrl}
-                tokenUrl={tokenUrl}
-                clientOptions={clientOptions}
-                termOptions={termOptions}
-                flowControl={flowControl}
-            />
+            <div style={{ width: '100vw', height: '100vh' }}>
+                {show ? (
+                    <Terminal
+                        id="terminal-container"
+                        wsUrl={wsUrl}
+                        tokenUrl={tokenUrl}
+                        clientOptions={clientOptions}
+                        termOptions={termOptions}
+                        flowControl={flowControl}
+                    />
+                ) : (
+                    <button
+                        onClick={async () => {
+                            setShow(true);
+                            while (!window.term || !window.term.paste || typeof window.term.paste !== 'function') {
+                                await this.sleep(100);
+                            }
+                            window.term.paste('whoami');
+                            const text = document.querySelector('textarea.xterm-helper-textarea');
+                            if (text) {
+                                text.dispatchEvent(new KeyboardEvent('keypress', { charCode: 13 }));
+                            }
+                            window.term.fit();
+                        }}
+                    >
+                        Show
+                    </button>
+                )}
+            </div>
         );
     }
 }

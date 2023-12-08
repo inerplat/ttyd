@@ -251,14 +251,14 @@ export class Xterm {
     private onSocketOpen() {
         console.log('[ttyd] websocket connection opened');
 
-        const { textEncoder, terminal, overlayAddon } = this;
+        const { textEncoder, terminal } = this;
         const msg = JSON.stringify({ AuthToken: this.token, columns: terminal.cols, rows: terminal.rows });
         this.socket?.send(textEncoder.encode(msg));
 
         if (this.opened) {
             terminal.reset();
             terminal.options.disableStdin = false;
-            overlayAddon.showOverlay('Reconnected', 300);
+            window.location.reload();
         } else {
             this.opened = true;
         }
