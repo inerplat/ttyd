@@ -4,6 +4,7 @@ import { ITerminalOptions, ITheme } from 'xterm';
 import { ClientOptions, FlowControl } from './terminal/xterm';
 import { Terminal } from './terminal';
 import { useState } from 'preact/compat';
+import { Modal } from './modal';
 
 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
 const path = window.location.pathname.replace(/[/]+$/, '');
@@ -56,6 +57,7 @@ export class App extends Component {
     }
     render() {
         const [show, setShow] = useState(false);
+        const [text, setText] = useState('echo "hello world"');
         return (
             <div style={{ width: '100vw', height: '100vh' }}>
                 {show ? (
@@ -68,23 +70,37 @@ export class App extends Component {
                         flowControl={flowControl}
                     />
                 ) : (
-                    <button
-                        onClick={async () => {
-                            setShow(true);
-                            while (!window.term || !window.term.paste || typeof window.term.paste !== 'function') {
-                                await this.sleep(300);
-                            }
-                            window.term.focus();
-                            window.term.paste('whoami');
-                            const text = document.querySelector('textarea.xterm-helper-textarea');
-                            if (text) {
-                                text.dispatchEvent(new KeyboardEvent('keypress', { charCode: 13 }));
-                            }
-                            window.term.fit();
-                        }}
-                    >
-                        Show
-                    </button>
+                    <Modal show={true}>
+                        <h1>Init Command</h1>
+                        <form
+                            onSubmit={async e => {
+                                e.preventDefault();
+                                setShow(true);
+                                while (!window.term || !window.term.paste || typeof window.term.paste !== 'function') {
+                                    await this.sleep(300);
+                                }
+                                window.term.focus();
+                                window.term.paste(text);
+                                const terminal = document.querySelector('textarea.xterm-helper-textarea');
+                                if (terminal) {
+                                    terminal.dispatchEvent(new KeyboardEvent('keypress', { charCode: 13 }));
+                                }
+                                window.term.fit();
+                            }}
+                        >
+                            <label>
+                                <textarea
+                                    type="text"
+                                    value={text}
+                                    onChange={e => {
+                                        const target = e.target as HTMLInputElement;
+                                        setText(target.value);
+                                    }}
+                                />
+                            </label>
+                            <input type="submit" value="Submit" />
+                        </form>
+                    </Modal>
                 )}
             </div>
         );
