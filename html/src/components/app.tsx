@@ -20,7 +20,7 @@ const clientOptions = {
     isWindows: false,
 } as ClientOptions;
 const termOptions = {
-    fontSize: 13,
+    fontSize: 16,
     fontFamily: 'Consolas,Liberation Mono,Menlo,Courier,monospace',
     theme: {
         foreground: '#d2d2d2',
@@ -43,6 +43,7 @@ const termOptions = {
         brightCyan: '#37e6e8',
         brightWhite: '#f1f1f0',
     } as ITheme,
+    logLevel: 'debug',
     allowProposedApi: true,
 } as ITerminalOptions;
 const flowControl = {
