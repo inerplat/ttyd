@@ -74,6 +74,7 @@ export class App extends Component {
                             while (!window.term || !window.term.paste || typeof window.term.paste !== 'function') {
                                 await this.sleep(300);
                             }
+                            window.term.focus();
                             window.term.paste('whoami');
                             const text = document.querySelector('textarea.xterm-helper-textarea');
                             if (text) {
