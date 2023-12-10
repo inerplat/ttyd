@@ -72,7 +72,7 @@ export class App extends Component {
                         onClick={async () => {
                             setShow(true);
                             while (!window.term || !window.term.paste || typeof window.term.paste !== 'function') {
-                                await this.sleep(100);
+                                await this.sleep(300);
                             }
                             window.term.paste('whoami');
                             const text = document.querySelector('textarea.xterm-helper-textarea');

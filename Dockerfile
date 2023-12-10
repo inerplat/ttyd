@@ -22,7 +22,7 @@ RUN mkdir build && \
     make && \
     make install
 
-FROM node:18.4.0 as web-builder
+FROM node:20.10.0 as web-builder
 
 WORKDIR /build
 
@@ -47,6 +47,8 @@ RUN apt update &&  \
     lrzsz \
     tini \
     && rm -rf /var/lib/apt/lists/*
+
+RUN rm -rf /etc/nginx/sites-enabled/default
 
 COPY --from=web-builder /build/dist /usr/share/nginx/html
 COPY --from=web-builder /build/nginx.conf /etc/nginx/conf.d/default.conf
