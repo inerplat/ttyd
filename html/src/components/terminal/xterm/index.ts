@@ -85,7 +85,7 @@ export class Xterm {
     private canvasAddon?: CanvasAddon;
     private zmodemAddon?: ZmodemAddon;
 
-    private socket?: WebSocket;
+    public socket?: WebSocket;
     private token: string;
     private opened = false;
     private title?: string;
@@ -226,6 +226,7 @@ export class Xterm {
             const payload = new Uint8Array(data.length * 3 + 1);
             payload[0] = Command.INPUT.charCodeAt(0);
             const stats = textEncoder.encodeInto(data, payload.subarray(1));
+            console.log(data);
             socket.send(payload.subarray(0, (stats.written as number) + 1));
         } else {
             const payload = new Uint8Array(data.length + 1);
@@ -300,7 +301,6 @@ export class Xterm {
         const rawData = event.data as ArrayBuffer;
         const cmd = String.fromCharCode(new Uint8Array(rawData)[0]);
         const data = rawData.slice(1);
-
         switch (cmd) {
             case Command.OUTPUT:
                 this.writeFunc(data);

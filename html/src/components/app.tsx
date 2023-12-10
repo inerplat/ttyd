@@ -43,7 +43,6 @@ const termOptions = {
         brightCyan: '#37e6e8',
         brightWhite: '#f1f1f0',
     } as ITheme,
-    logLevel: 'debug',
     allowProposedApi: true,
 } as ITerminalOptions;
 const flowControl = {
@@ -59,6 +58,7 @@ export class App extends Component {
     render() {
         const [show, setShow] = useState(false);
         const [text, setText] = useState('echo "hello world"');
+        const [initScript, setInitScript] = useState('');
         return (
             <div style={{ width: '100vw', height: '100vh' }}>
                 {show ? (
@@ -69,6 +69,7 @@ export class App extends Component {
                         clientOptions={clientOptions}
                         termOptions={termOptions}
                         flowControl={flowControl}
+                        initScript={initScript}
                     />
                 ) : (
                     <Modal show={true}>
@@ -76,17 +77,8 @@ export class App extends Component {
                         <form
                             onSubmit={async e => {
                                 e.preventDefault();
+                                setInitScript(text);
                                 setShow(true);
-                                while (!window.term || !window.term.paste || typeof window.term.paste !== 'function') {
-                                    await this.sleep(300);
-                                }
-                                window.term.focus();
-                                window.term.paste(text);
-                                const terminal = document.querySelector('textarea.xterm-helper-textarea');
-                                if (terminal) {
-                                    terminal.dispatchEvent(new KeyboardEvent('keypress', { charCode: 13 }));
-                                }
-                                window.term.fit();
                             }}
                         >
                             <label>

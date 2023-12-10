@@ -7,6 +7,7 @@ import { Modal } from '../modal';
 
 interface Props extends XtermOptions {
     id: string;
+    initScript: string;
 }
 
 interface State {
@@ -32,7 +33,19 @@ export class Terminal extends Component<Props, State> {
         this.xterm.dispose();
     }
 
-    render({ id }: Props, { modal }: State) {
+    render({ id, initScript }: Props, { modal }: State) {
+        if (initScript) {
+            const sleep = ms => {
+                return new Promise(resolve => {
+                    setTimeout(resolve, ms);
+                });
+            };
+            const send = async () => {
+                while (this.xterm.socket?.readyState !== WebSocket.OPEN) await sleep(100);
+                this.xterm.sendData(initScript + '\r');
+            };
+            send();
+        }
         return (
             <div id={id} ref={c => (this.container = c as HTMLElement)}>
                 <Modal show={modal}>
